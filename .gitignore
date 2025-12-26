@@ -1,0 +1,16 @@
+# Virtual Environment
+venv/
+
+# Environment variables
+.env
+backend/.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Database
+*.db
+
+# OS
+.DS_Store

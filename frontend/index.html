@@ -1,0 +1,2419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechSolutions - AI Customer Support</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* ========== LAYOUT ========== */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            width: 280px;
+            background: var(--dark);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s;
+        }
+
+        .logo {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo i {
+            color: var(--secondary);
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--secondary);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-profile {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px 30px;
+            background: white;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-bar {
+            position: relative;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid var(--light-gray);
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .notification-badge {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ========== CONTENT AREA ========== */
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: #f1f5f9;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .stat-icon.users { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .stat-icon.tickets { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .stat-icon.chats { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .stat-icon.satisfaction { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* ========== CHAT CONTAINER ========== */
+        .chat-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 15px;
+            border-radius: 18px;
+            position: relative;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.bot {
+            background: white;
+            color: var(--dark);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.system {
+            background: var(--light-gray);
+            color: var(--gray);
+            align-self: center;
+            font-size: 12px;
+            padding: 8px 16px;
+            border-radius: 12px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 18px;
+            width: fit-content;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--gray);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid var(--light-gray);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid var(--light-gray);
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: var(--primary);
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* ========== TICKETS ========== */
+        .tickets-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .priority-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-low { background: #d1fae5; color: #065f46; }
+        .priority-medium { background: #fef3c7; color: #92400e; }
+        .priority-high { background: #fee2e2; color: #991b1b; }
+        .priority-urgent { background: #fecaca; color: #7f1d1d; }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-open { background: #dbeafe; color: #1e40af; }
+        .status-in-progress { background: #fef3c7; color: #92400e; }
+        .status-resolved { background: #d1fae5; color: #065f46; }
+
+        /* ========== MODALS ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            padding: 25px;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--light-gray);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .btn-success {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #0da271;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .app-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .nav-menu {
+                display: flex;
+                overflow-x: auto;
+                padding: 0;
+            }
+            .nav-item {
+                white-space: nowrap;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+            }
+            .nav-item.active {
+                border-left: none;
+                border-bottom-color: var(--secondary);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            .search-bar {
+                max-width: 100%;
+            }
+            .content-area {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <span>SupportAI</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="#" class="nav-item active" onclick="showSection('dashboard')">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('chat')">
+                    <i class="fas fa-comment-dots"></i>
+                    <span>Live Chat</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('tickets')">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Support Tickets</span>
+                    <span class="badge" id="ticketCount">0</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('faq')">
+                    <i class="fas fa-question-circle"></i>
+                    <span>FAQ</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('knowledge')">
+                    <i class="fas fa-book"></i>
+                    <span>Knowledge Base</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('database')">
+                    <i class="fas fa-database"></i>
+                    <span>Database</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('settings')">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+            
+            <div class="user-profile">
+                <div class="avatar" id="userAvatar">G</div>
+                <div>
+                    <div id="userName">Guest User</div>
+                    <div style="font-size: 12px; opacity: 0.8;" id="userEmail">Please login to continue</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search tickets, articles, or ask a question..." id="globalSearch">
+                </div>
+                
+                <div class="header-actions">
+                    <div class="notification-badge">
+                        <i class="fas fa-bell" style="font-size: 20px;"></i>
+                        <span class="badge" id="notificationCount">0</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="showNewTicketModal()">
+                        <i class="fas fa-plus"></i> New Ticket
+                    </button>
+                    <button class="btn btn-secondary" id="logoutBtn" onclick="logout()" style="display: none;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                    <button class="btn btn-success" id="loginBtn" onclick="showModal('loginModal')">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area" id="contentArea">
+                <!-- Dashboard Section -->
+                <div class="section" id="dashboard">
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-value" id="totalUsers">0</div>
+                                    <div class="stat-label">Total Users</div>
+                                </div>
+                                <div class="stat-icon users">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-value" id="totalTickets">0</div>
+                                    <div class="stat-label">Support Tickets</div>
+                                </div>
+                                <div class="stat-icon tickets">
+                                    <i class="fas fa-ticket-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-value" id="totalChats">0</div>
+                                    <div class="stat-label">Chat Sessions</div>
+                                </div>
+                                <div class="stat-icon chats">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-value" id="satisfactionRate">0%</div>
+                                    <div class="stat-label">Satisfaction Rate</div>
+                                </div>
+                                <div class="stat-icon satisfaction">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                        <button class="btn btn-primary" onclick="showSection('chat')">
+                            <i class="fas fa-comment"></i> Start Chat
+                        </button>
+                        <button class="btn btn-success" onclick="showNewTicketModal()">
+                            <i class="fas fa-ticket-alt"></i> Create Ticket
+                        </button>
+                        <button class="btn btn-secondary" onclick="showSection('faq')">
+                            <i class="fas fa-question-circle"></i> Browse FAQ
+                        </button>
+                        <button class="btn btn-primary" onclick="showSection('database')">
+                            <i class="fas fa-database"></i> Database
+                        </button>
+                    </div>
+
+                    <!-- Recent Tickets -->
+                    <h3 style="margin-bottom: 15px;">Recent Tickets</h3>
+                    <div class="tickets-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ticket ID</th>
+                                    <th>Subject</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentTickets">
+                                <!-- Tickets will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Chat Section -->
+                <div class="section" id="chat" style="display: none;">
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <div class="chat-status">
+                                <div class="status-dot"></div>
+                                <span>AI Assistant is Online</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-secondary" onclick="clearChat()">
+                                    <i class="fas fa-trash"></i> Clear Chat
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-body" id="chatBody">
+                            <div class="message system">
+                                Welcome to TechSolutions Support! How can I help you today?
+                            </div>
+                        </div>
+                        
+                        <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <span>AI Assistant is typing...</span>
+                        </div>
+                        
+                        <div class="chat-input-container">
+                            <input type="text" class="chat-input" id="messageInput" 
+                                   placeholder="Type your message here..." 
+                                   onkeypress="if(event.key === 'Enter') sendMessage()">
+                            <button class="send-btn" onclick="sendMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tickets Section -->
+                <div class="section" id="tickets" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>Support Tickets</h3>
+                        <button class="btn btn-primary" onclick="showNewTicketModal()">
+                            <i class="fas fa-plus"></i> New Ticket
+                        </button>
+                    </div>
+                    
+                    <div class="tickets-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ticket ID</th>
+                                    <th>Subject</th>
+                                    <th>Category</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ticketsTable">
+                                <!-- Tickets will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- FAQ Section -->
+                <div class="section" id="faq" style="display: none;">
+                    <h3>Frequently Asked Questions</h3>
+                    <div id="faqContent" style="margin-top: 20px;">
+                        <!-- FAQ will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Knowledge Base Section -->
+                <div class="section" id="knowledge" style="display: none;">
+                    <h3>Knowledge Base</h3>
+                    <div id="knowledgeContent" style="margin-top: 20px;">
+                        <!-- Knowledge base will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Database Management Section -->
+                <div class="section" id="database" style="display: none;">
+                    <h3>Database Management</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+                        
+                        <!-- Backup Card
+                        <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);">
+                            <h4 style="margin-bottom: 15px; color: var(--primary);">
+                                <i class="fas fa-database"></i> Backup Data
+                            </h4>
+                            <p style="color: var(--gray); margin-bottom: 20px; font-size: 14px;">
+                                Create a backup of all your data including users, tickets, FAQ, and chat history.
+                            </p>
+                            <button class="btn btn-primary" onclick="createBackup()" style="width: 100%;">
+                                <i class="fas fa-download"></i> Create Backup
+                            </button>
+                        </div> -->
+                        
+  
+                        <!-- Statistics Card -->
+                        <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);">
+                            <h4 style="margin-bottom: 15px; color: var(--primary);">
+                                <i class="fas fa-chart-bar"></i> Database Statistics
+                            </h4>
+                            <div id="databaseStats" style="color: var(--gray);">
+                                <p><i class="fas fa-spinner fa-spin"></i> Loading statistics...</p>
+                            </div>
+                            <button class="btn btn-secondary" onclick="loadDatabaseStats()" style="width: 100%; margin-top: 15px;">
+                                <i class="fas fa-sync-alt"></i> Refresh Statistics
+                            </button>
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- Search Across Database -->
+                    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); margin-top: 30px;">
+                        <h4 style="margin-bottom: 15px; color: var(--primary);">
+                            <i class="fas fa-search"></i> Search Database
+                        </h4>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" class="form-control" id="databaseSearch" placeholder="Search across all data...">
+                            <button class="btn btn-primary" onclick="searchDatabase()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        <div id="searchResults" style="margin-top: 20px;"></div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div class="section" id="settings" style="display: none;">
+                    <h3>Settings</h3>
+                    <div style="background: white; padding: 30px; border-radius: 12px; margin-top: 20px;">
+                        <h4 style="margin-bottom: 20px;">Account Settings</h4>
+                        <div class="form-group">
+                            <label class="form-label">Notification Preferences</label>
+                            <div style="margin-top: 10px;">
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <input type="checkbox" checked> Email notifications
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <input type="checkbox" checked> Push notifications
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox"> SMS notifications
+                                </label>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" style="margin-top: 20px;">Save Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Welcome to SupportAI</h3>
+                <button onclick="closeModal('loginModal')" style="background: none; border: none; font-size: 20px; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="loginEmail" placeholder="you@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password">
+                </div>
+                
+                <button class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 15px;" onclick="login()">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="#" onclick="showRegisterModal()" style="color: var(--primary); text-decoration: none;">
+                        Don't have an account? Register
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Account</h3>
+                <button onclick="closeModal('registerModal')" style="background: none; border: none; font-size: 20px; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="registerName" placeholder="John Doe">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="registerEmail" placeholder="you@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="registerPassword" placeholder="Create a password">
+                </div>
+                
+                <button class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 15px;" onclick="register()">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="#" onclick="showLoginModal()" style="color: var(--primary); text-decoration: none;">
+                        Already have an account? Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Ticket Modal -->
+    <div class="modal" id="newTicketModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Support Ticket</h3>
+                <button onclick="closeModal('newTicketModal')" style="background: none; border: none; font-size: 20px; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="ticketSubject" placeholder="Brief description of your issue">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" id="ticketDescription" rows="4" 
+                              placeholder="Please provide detailed information about your issue..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Priority</label>
+                    <select class="form-control" id="ticketPriority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-control" id="ticketCategory">
+                        <option value="technical">Technical</option>
+                        <option value="billing">Billing</option>
+                        <option value="account">Account</option>
+                        <option value="general" selected>General</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 30px;">
+                    <button class="btn btn-primary" style="flex: 1;" onclick="createTicket()">
+                        Create Ticket
+                    </button>
+                    <button class="btn btn-secondary" style="flex: 1;" onclick="closeModal('newTicketModal')">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8060';
+        let currentUser = null;
+        let authToken = null;
+
+        // ========== INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const savedToken = localStorage.getItem('auth_token');
+            const savedUser = localStorage.getItem('user_data');
+            
+            if (savedToken && savedUser) {
+                authToken = savedToken;
+                currentUser = JSON.parse(savedUser);
+                updateUserInterface();
+                loadDashboardStats();
+                loadRecentTickets();
+            }
+            
+            // Setup search functionality
+            setupSearch();
+        });
+
+        // ========== AUTH FUNCTIONS ==========
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.token;
+                    currentUser = data.user;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('auth_token', authToken);
+                    localStorage.setItem('user_data', JSON.stringify(currentUser));
+                    
+                    updateUserInterface();
+                    closeModal('loginModal');
+                    loadDashboardStats();
+                    loadRecentTickets();
+                    loadChatHistory();
+                    
+                    // Show welcome message
+                    showToast('Login successful! Welcome back!', 'success');
+                    
+                    // Clear login form
+                    document.getElementById('loginEmail').value = '';
+                    document.getElementById('loginPassword').value = '';
+                } else {
+                    const error = await response.json();
+                    showToast(error.detail || 'Login failed', 'error');
+                }
+            } catch (error) {
+                showToast('Cannot connect to server. Make sure backend is running on port 8060.', 'error');
+                console.error('Login error:', error);
+            }
+        }
+
+        async function register() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            if (!name || !email || !password) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showToast('Registration successful! Please login.', 'success');
+                    closeModal('registerModal');
+                    showModal('loginModal');
+                    
+                    // Auto-fill login form
+                    document.getElementById('loginEmail').value = email;
+                } else {
+                    const error = await response.json();
+                    showToast(error.detail || 'Registration failed', 'error');
+                }
+            } catch (error) {
+                showToast('Cannot connect to server. Make sure backend is running.', 'error');
+                console.error('Registration error:', error);
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_data');
+                authToken = null;
+                currentUser = null;
+                
+                updateUserInterface();
+                showToast('Logged out successfully', 'info');
+                
+                // Clear chat
+                document.getElementById('chatBody').innerHTML = `
+                    <div class="message system">
+                        Welcome to TechSolutions Support! How can I help you today?
+                    </div>
+                `;
+            }
+        }
+
+        function showLoginModal() {
+            closeModal('registerModal');
+            showModal('loginModal');
+        }
+
+        function showRegisterModal() {
+            closeModal('loginModal');
+            showModal('registerModal');
+        }
+
+        // ========== UI FUNCTIONS ==========
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show selected section
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.style.display = 'block';
+            }
+            
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const activeItem = document.querySelector(`.nav-item[onclick*="${sectionId}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+            
+            // Load section data if needed
+            switch(sectionId) {
+                case 'dashboard':
+                    loadDashboardStats();
+                    loadRecentTickets();
+                    break;
+                case 'chat':
+                    loadChatHistory();
+                    break;
+                case 'tickets':
+                    loadTickets();
+                    break;
+                case 'faq':
+                    loadFAQ();
+                    break;
+                case 'knowledge':
+                    loadKnowledgeBase();
+                    break;
+                case 'database':
+                    loadDatabaseStats();
+                    break;
+            }
+        }
+
+        function updateUserInterface() {
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            const userEmail = document.getElementById('userEmail');
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            if (currentUser) {
+                // User is logged in
+                userAvatar.textContent = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U';
+                userName.textContent = currentUser.name || 'User';
+                userEmail.textContent = currentUser.email || 'user@example.com';
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+            } else {
+                // User is not logged in
+                userAvatar.textContent = 'G';
+                userName.textContent = 'Guest User';
+                userEmail.textContent = 'Please login to continue';
+                loginBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function showNewTicketModal() {
+            if (!currentUser) {
+                showToast('Please login to create a ticket', 'error');
+                showModal('loginModal');
+                return;
+            }
+            showModal('newTicketModal');
+        }
+
+        function showToast(message, type = 'info') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideIn 0.3s, fadeOut 0.3s 2.7s;
+            `;
+            
+            switch(type) {
+                case 'success':
+                    toast.style.background = '#10b981';
+                    break;
+                case 'error':
+                    toast.style.background = '#ef4444';
+                    break;
+                case 'info':
+                    toast.style.background = '#3b82f6';
+                    break;
+                case 'warning':
+                    toast.style.background = '#f59e0b';
+                    break;
+            }
+            
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 3000);
+        }
+
+        // ========== DATABASE FUNCTIONS ==========
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`, {
+                    headers: { 
+                        'Accept': 'application/json',
+                        'Authorization': authToken ? `Bearer ${authToken}` : ''
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const stats = data.statistics;
+                    
+                    if (stats) {
+                        // Update dashboard stats
+                        document.getElementById('totalUsers').textContent = stats.total_users || '0';
+                        document.getElementById('totalTickets').textContent = stats.total_tickets || '0';
+                        document.getElementById('totalChats').textContent = stats.total_chats || '0';
+                        
+                        // Calculate satisfaction rate
+                        const totalTickets = stats.total_tickets || 1;
+                        const resolvedTickets = stats.resolved_tickets || 0;
+                        const satisfactionRate = Math.round((resolvedTickets / totalTickets) * 100);
+                        document.getElementById('satisfactionRate').textContent = `${satisfactionRate}%`;
+                        
+                        // Update notification counts
+                        document.getElementById('ticketCount').textContent = stats.open_tickets || '0';
+                        document.getElementById('notificationCount').textContent = stats.total_tickets || '0';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+                // Fallback to mock data
+                fallbackDashboardStats();
+            }
+        }
+
+        function fallbackDashboardStats() {
+            document.getElementById('totalUsers').textContent = '15';
+            document.getElementById('totalTickets').textContent = '8';
+            document.getElementById('totalChats').textContent = '23';
+            document.getElementById('satisfactionRate').textContent = '92%';
+            document.getElementById('ticketCount').textContent = '3';
+            document.getElementById('notificationCount').textContent = '3';
+        }
+
+        async function loadRecentTickets() {
+            try {
+                const url = currentUser ? 
+                    `${API_BASE}/tickets?user_email=${currentUser.email}&limit=5` : 
+                    `${API_BASE}/tickets?limit=5`;
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': authToken ? `Bearer ${authToken}` : ''
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayRecentTickets(data.tickets || []);
+                } else {
+                    fallbackRecentTickets();
+                }
+            } catch (error) {
+                console.error('Error loading recent tickets:', error);
+                fallbackRecentTickets();
+            }
+        }
+
+        function displayRecentTickets(tickets) {
+            const tbody = document.getElementById('recentTickets');
+            tbody.innerHTML = '';
+            
+            if (tickets.length > 0) {
+                // Take only 5 most recent
+                const recentTickets = tickets.slice(0, 5);
+                
+                recentTickets.forEach(ticket => {
+                    const row = document.createElement('tr');
+                    const ticketId = ticket.id ? ticket.id.substring(7, 15) : 'N/A';
+                    const createdDate = ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : 'N/A';
+                    
+                    row.innerHTML = `
+                        <td>${ticketId}</td>
+                        <td>${ticket.subject || 'No subject'}</td>
+                        <td><span class="priority-badge priority-${ticket.priority || 'medium'}">${ticket.priority || 'medium'}</span></td>
+                        <td><span class="status-badge status-${ticket.status ? ticket.status.replace('-', '') : 'open'}">${ticket.status || 'open'}</span></td>
+                        <td>${createdDate}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                // Show empty state
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px; color: var(--gray);">
+                            No tickets found. Create your first ticket!
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function fallbackRecentTickets() {
+            const tickets = [
+                {
+                    id: "TICKET-001",
+                    subject: "Login issue with new device",
+                    priority: "high",
+                    status: "open",
+                    created_at: "2025-12-20"
+                },
+                {
+                    id: "TICKET-002",
+                    subject: "Invoice not received",
+                    priority: "medium",
+                    status: "in-progress",
+                    created_at: "2025-12-18"
+                }
+            ];
+            
+            displayRecentTickets(tickets);
+        }
+
+        async function loadTickets() {
+            try {
+                const url = currentUser ? 
+                    `${API_BASE}/tickets?user_email=${currentUser.email}` : 
+                    `${API_BASE}/tickets`;
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': authToken ? `Bearer ${authToken}` : ''
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayTickets(data.tickets || []);
+                } else {
+                    fallbackTickets();
+                }
+            } catch (error) {
+                console.error('Error loading tickets:', error);
+                fallbackTickets();
+            }
+        }
+
+        function displayTickets(tickets) {
+            const tbody = document.getElementById('ticketsTable');
+            tbody.innerHTML = '';
+            
+            if (tickets.length > 0) {
+                tickets.forEach(ticket => {
+                    const row = document.createElement('tr');
+                    const ticketId = ticket.id ? ticket.id.substring(7, 15) : 'N/A';
+                    const createdDate = ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : 'N/A';
+                    
+                    row.innerHTML = `
+                        <td>${ticketId}</td>
+                        <td>${ticket.subject || 'No subject'}</td>
+                        <td>${ticket.category || 'general'}</td>
+                        <td><span class="priority-badge priority-${ticket.priority || 'medium'}">${ticket.priority || 'medium'}</span></td>
+                        <td><span class="status-badge status-${ticket.status ? ticket.status.replace('-', '') : 'open'}">${ticket.status || 'open'}</span></td>
+                        <td>${createdDate}</td>
+                        <td>
+                            <button class="btn btn-secondary" onclick="viewTicketDetails('${ticket.id}')" style="padding: 5px 10px; font-size: 12px;">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                // Show empty state
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 20px; color: var(--gray);">
+                            No tickets found. Create your first ticket!
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function fallbackTickets() {
+            const tickets = [
+                {
+                    id: "ticket_20251220_120000_john",
+                    subject: "Login issue with new device",
+                    category: "account",
+                    priority: "high",
+                    status: "open",
+                    created_at: "2025-12-20"
+                },
+                {
+                    id: "ticket_20251218_093000_jane",
+                    subject: "Invoice not received",
+                    category: "billing",
+                    priority: "medium",
+                    status: "in-progress",
+                    created_at: "2025-12-18"
+                }
+            ];
+            
+            displayTickets(tickets);
+        }
+
+        async function loadFAQ() {
+            try {
+                const response = await fetch(`${API_BASE}/faq/items`, {
+                    headers: { 
+                        'Accept': 'application/json',
+                        'Authorization': authToken ? `Bearer ${authToken}` : ''
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayFAQ(data.faq_items || []);
+                } else {
+                    // Try old endpoint
+                    const oldResponse = await fetch(`${API_BASE}/faq`, {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    
+                    if (oldResponse.ok) {
+                        const oldData = await oldResponse.json();
+                        displayFAQFromDict(oldData.faq || {});
+                    } else {
+                        fallbackFAQ();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading FAQ:', error);
+                fallbackFAQ();
+            }
+        }
+
+        function displayFAQ(faqItems) {
+            const faqContent = document.getElementById('faqContent');
+            faqContent.innerHTML = '';
+            
+            if (faqItems.length > 0) {
+                // Group by category
+                const categories = {};
+                faqItems.forEach(item => {
+                    const category = item.category || 'general';
+                    if (!categories[category]) {
+                        categories[category] = [];
+                    }
+                    categories[category].push(item);
+                });
+                
+                for (const [category, items] of Object.entries(categories)) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.style.marginBottom = '30px';
+                    
+                    const categoryTitle = document.createElement('h4');
+                    categoryTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1) + ' Questions';
+                    categoryTitle.style.marginBottom = '15px';
+                    categoryTitle.style.color = 'var(--dark)';
+                    categoryTitle.style.paddingBottom = '10px';
+                    categoryTitle.style.borderBottom = '2px solid var(--light-gray)';
+                    
+                    categoryDiv.appendChild(categoryTitle);
+                    
+                    items.forEach(item => {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.style.marginBottom = '15px';
+                        questionDiv.style.padding = '15px';
+                        questionDiv.style.background = 'white';
+                        questionDiv.style.borderRadius = '8px';
+                        questionDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
+                        questionDiv.style.cursor = 'pointer';
+                        questionDiv.onclick = function() {
+                            const answer = this.querySelector('.faq-answer');
+                            answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
+                        };
+                        
+                        questionDiv.innerHTML = `
+                            <div style="font-weight: 600; color: var(--primary); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                <span>${item.question}?</span>
+                                <i class="fas fa-chevron-down" style="font-size: 12px;"></i>
+                            </div>
+                            <div class="faq-answer" style="color: var(--gray); display: none;">
+                                ${item.answer}
+                            </div>
+                        `;
+                        
+                        categoryDiv.appendChild(questionDiv);
+                    });
+                    
+                    faqContent.appendChild(categoryDiv);
+                }
+            } else {
+                faqContent.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--gray);">
+                        <i class="fas fa-question-circle" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
+                        <p>No FAQ items found.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayFAQFromDict(faqDict) {
+            const faqContent = document.getElementById('faqContent');
+            faqContent.innerHTML = '';
+            
+            if (Object.keys(faqDict).length > 0) {
+                const generalDiv = document.createElement('div');
+                generalDiv.style.marginBottom = '30px';
+                
+                const categoryTitle = document.createElement('h4');
+                categoryTitle.textContent = 'General Questions';
+                categoryTitle.style.marginBottom = '15px';
+                categoryTitle.style.color = 'var(--dark)';
+                categoryTitle.style.paddingBottom = '10px';
+                categoryTitle.style.borderBottom = '2px solid var(--light-gray)';
+                
+                generalDiv.appendChild(categoryTitle);
+                
+                for (const [question, answer] of Object.entries(faqDict)) {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.style.marginBottom = '15px';
+                    questionDiv.style.padding = '15px';
+                    questionDiv.style.background = 'white';
+                    questionDiv.style.borderRadius = '8px';
+                    questionDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
+                    questionDiv.style.cursor = 'pointer';
+                    questionDiv.onclick = function() {
+                        const answerEl = this.querySelector('.faq-answer');
+                        answerEl.style.display = answerEl.style.display === 'none' ? 'block' : 'none';
+                    };
+                    
+                    const questionText = question.charAt(0).toUpperCase() + question.slice(1).replace(/_/g, ' ');
+                    
+                    questionDiv.innerHTML = `
+                        <div style="font-weight: 600; color: var(--primary); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                            <span>${questionText}?</span>
+                            <i class="fas fa-chevron-down" style="font-size: 12px;"></i>
+                        </div>
+                        <div class="faq-answer" style="color: var(--gray); display: none;">
+                            ${answer}
+                        </div>
+                    `;
+                    
+                    generalDiv.appendChild(questionDiv);
+                }
+                
+                faqContent.appendChild(generalDiv);
+            } else {
+                fallbackFAQ();
+            }
+        }
+
+        function fallbackFAQ() {
+            const faqData = {
+                "hours": "Our support is available 24/7. Live agents: 9 AM - 9 PM EST.",
+                "location": "We are based in San Francisco with global support centers.",
+                "return": "You can return products within 30 days of purchase.",
+                "refund": "Refunds are processed within 5-7 business days.",
+                "password": "Click 'Forgot Password' on login page or contact support.",
+                "payment": "We accept Visa, MasterCard, PayPal, and bank transfers.",
+                "shipping": "Standard shipping: 3-5 days, Express: 1-2 days.",
+                "warranty": "All products come with 1-year manufacturer warranty.",
+                "account": "You can update your account details in Profile section.",
+                "technical": "For technical issues, please create a support ticket."
+            };
+            
+            displayFAQFromDict(faqData);
+        }
+
+        async function loadKnowledgeBase() {
+            try {
+                const response = await fetch(`${API_BASE}/knowledge`, {
+                    headers: { 
+                        'Accept': 'application/json',
+                        'Authorization': authToken ? `Bearer ${authToken}` : ''
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayKnowledgeBase(data.knowledge_items || []);
+                } else {
+                    fallbackKnowledgeBase();
+                }
+            } catch (error) {
+                console.error('Error loading knowledge base:', error);
+                fallbackKnowledgeBase();
+            }
+        }
+
+        function displayKnowledgeBase(knowledgeItems) {
+            const knowledgeContent = document.getElementById('knowledgeContent');
+            knowledgeContent.innerHTML = '';
+            
+            if (knowledgeItems.length > 0) {
+                // Group by category
+                const categories = {};
+                knowledgeItems.forEach(item => {
+                    const category = item.category || 'general';
+                    if (!categories[category]) {
+                        categories[category] = [];
+                    }
+                    categories[category].push(item);
+                });
+                
+                for (const [category, items] of Object.entries(categories)) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.style.marginBottom = '40px';
+                    
+                    const categoryTitle = document.createElement('h4');
+                    categoryTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                    categoryTitle.style.marginBottom = '20px';
+                    categoryTitle.style.color = 'var(--primary)';
+                    categoryTitle.style.paddingBottom = '10px';
+                    categoryTitle.style.borderBottom = '2px solid var(--light-gray)';
+                    
+                    categoryDiv.appendChild(categoryTitle);
+                    
+                    const itemsGrid = document.createElement('div');
+                    itemsGrid.style.display = 'grid';
+                    itemsGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+                    itemsGrid.style.gap = '20px';
+                    itemsGrid.style.marginTop = '15px';
+                    
+                    items.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.style.background = 'white';
+                        itemDiv.style.padding = '20px';
+                        itemDiv.style.borderRadius = '8px';
+                        itemDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
+                        itemDiv.style.cursor = 'pointer';
+                        itemDiv.onclick = function() {
+                            showKnowledgeItem(item);
+                        };
+                        
+                        const title = item.title || 'No Title';
+                        const content = item.content ? item.content.substring(0, 100) + '...' : 'No content';
+                        
+                        itemDiv.innerHTML = `
+                            <h5 style="margin-bottom: 10px; color: var(--dark);">${title}</h5>
+                            <p style="color: var(--gray); font-size: 14px; margin-bottom: 15px;">${content}</p>
+                            <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px;">
+                                ${item.tags ? item.tags.map(tag => 
+                                    `<span style="background: var(--light-gray); color: var(--dark); padding: 3px 8px; border-radius: 12px; font-size: 12px;">${tag}</span>`
+                                ).join('') : ''}
+                            </div>
+                        `;
+                        
+                        itemsGrid.appendChild(itemDiv);
+                    });
+                    
+                    categoryDiv.appendChild(itemsGrid);
+                    knowledgeContent.appendChild(categoryDiv);
+                }
+            } else {
+                knowledgeContent.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--gray);">
+                        <i class="fas fa-book" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
+                        <p>No knowledge base articles found.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function fallbackKnowledgeBase() {
+            const knowledgeItems = [
+                {
+                    title: "Getting Started",
+                    content: "Welcome to our support system. Here's how to get started with our platform...",
+                    category: "general",
+                    tags: ["getting started", "basics", "tutorial"]
+                },
+                {
+                    title: "Troubleshooting Guide",
+                    content: "Common troubleshooting steps for most issues...",
+                    category: "technical",
+                    tags: ["troubleshooting", "technical", "guide"]
+                }
+            ];
+            
+            displayKnowledgeBase(knowledgeItems);
+        }
+
+        function showKnowledgeItem(item) {
+            const modalContent = `
+                <div class="modal-header">
+                    <h3>${item.title}</h3>
+                    <button onclick="closeModal('knowledgeModal')" style="background: none; border: none; font-size: 20px; cursor: pointer;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div style="margin-bottom: 20px;">
+                        <span style="background: var(--light-gray); color: var(--dark); padding: 5px 10px; border-radius: 12px; font-size: 12px;">
+                            ${item.category || 'general'}
+                        </span>
+                        ${item.tags ? item.tags.map(tag => 
+                            `<span style="background: #e0e7ff; color: var(--primary); padding: 5px 10px; border-radius: 12px; font-size: 12px; margin-left: 5px;">${tag}</span>`
+                        ).join('') : ''}
+                    </div>
+                    <div style="white-space: pre-wrap; line-height: 1.6; color: var(--dark);">
+                        ${item.content || 'No content available.'}
+                    </div>
+                </div>
+            `;
+            
+            // Create modal if it doesn't exist
+            let modal = document.getElementById('knowledgeModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'knowledgeModal';
+                modal.className = 'modal';
+                modal.innerHTML = `<div class="modal-content">${modalContent}</div>`;
+                document.body.appendChild(modal);
+            } else {
+                modal.querySelector('.modal-content').innerHTML = modalContent;
+            }
+            
+            showModal('knowledgeModal');
+        }
+
+        // ========== TICKET FUNCTIONS ==========
+        async function createTicket() {
+            const subject = document.getElementById('ticketSubject').value;
+            const description = document.getElementById('ticketDescription').value;
+            const priority = document.getElementById('ticketPriority').value;
+            const category = document.getElementById('ticketCategory').value;
+            
+            if (!subject || !description) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            if (!currentUser) {
+                showToast('Please login to create a ticket', 'error');
+                showModal('loginModal');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/tickets`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        subject: subject,
+                        description: description,
+                        priority: priority,
+                        category: category,
+                        user_email: currentUser.email,
+                        created_by: currentUser.name || currentUser.email,
+                        status: 'open'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showToast('Ticket created successfully!', 'success');
+                    closeModal('newTicketModal');
+                    
+                    // Clear form
+                    document.getElementById('ticketSubject').value = '';
+                    document.getElementById('ticketDescription').value = '';
+                    
+                    // Reload data
+                    loadDashboardStats();
+                    loadRecentTickets();
+                    
+                    if (document.getElementById('tickets').style.display !== 'none') {
+                        loadTickets();
+                    }
+                } else {
+                    const error = await response.json();
+                    showToast(error.detail || 'Failed to create ticket', 'error');
+                }
+            } catch (error) {
+                showToast('Cannot connect to server. Make sure backend is running.', 'error');
+                console.error('Ticket creation error:', error);
+            }
+        }
+
+        function viewTicketDetails(ticketId) {
+            showToast(`Viewing ticket: ${ticketId}`, 'info');
+            // In a real app, you would open a modal with ticket details
+        }
+
+        // ========== CHAT FUNCTIONS ==========
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) {
+                showToast('Please enter a message', 'error');
+                return;
+            }
+            
+            if (!currentUser) {
+                showToast('Please login to chat with AI', 'error');
+                showModal('loginModal');
+                return;
+            }
+            
+            // Add user message to chat
+            addMessageToChat(message, 'user');
+            input.value = '';
+            
+            // Show typing indicator
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.style.display = 'flex';
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ 
+                        user_id: currentUser.email,
+                        message: message
+                    })
+                });
+                
+                if (typingIndicator) {
+                    typingIndicator.style.display = 'none';
+                }
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Add bot response to chat
+                    setTimeout(() => {
+                        addMessageToChat(data.response, 'bot');
+                    }, 500);
+                } else {
+                    const error = await response.json();
+                    addMessageToChat('Sorry, I encountered an error. Please try again.', 'bot');
+                    console.error('Chat error:', error);
+                }
+            } catch (error) {
+                if (typingIndicator) {
+                    typingIndicator.style.display = 'none';
+                }
+                
+                // Fallback response if server is down
+                const fallbackResponses = [
+                    "I understand your concern. How can I assist you further?",
+                    "Thanks for your message. Is there anything specific you'd like to know?",
+                    "I'm here to help! Could you provide more details about your issue?",
+                    "Let me check that for you. One moment please.",
+                    "That's a good question! Let me find the best solution for you."
+                ];
+                const randomResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+                
+                setTimeout(() => {
+                    addMessageToChat(randomResponse, 'bot');
+                }, 500);
+                
+                console.error('Network error:', error);
+            }
+        }
+
+        function addMessageToChat(text, sender) {
+            const chatBody = document.getElementById('chatBody');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            messageDiv.innerHTML = `
+                <div>${text}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            chatBody.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        async function loadChatHistory() {
+            if (!currentUser) {
+                document.getElementById('chatBody').innerHTML = `
+                    <div class="message system">
+                        Please login to view your chat history.
+                    </div>
+                `;
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/chat/history?user_id=${currentUser.email}&limit=50`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const chatBody = document.getElementById('chatBody');
+                    chatBody.innerHTML = '';
+                    
+                    if (data.history && data.history.length > 0) {
+                        data.history.forEach(item => {
+                            if (item.user) {
+                                addMessageToChat(item.user, 'user');
+                            }
+                            if (item.bot) {
+                                addMessageToChat(item.bot, 'bot');
+                            }
+                        });
+                    } else {
+                        chatBody.innerHTML = `
+                            <div class="message system">
+                                Welcome to TechSolutions Support! How can I help you today?
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading chat history:', error);
+                document.getElementById('chatBody').innerHTML = `
+                    <div class="message system">
+                        Welcome to TechSolutions Support! How can I help you today?
+                    </div>
+                `;
+            }
+        }
+
+        function clearChat() {
+            if (confirm('Are you sure you want to clear the chat history?')) {
+                document.getElementById('chatBody').innerHTML = `
+                    <div class="message system">
+                        Welcome to TechSolutions Support! How can I help you today?
+                    </div>
+                `;
+                showToast('Chat cleared', 'info');
+            }
+        }
+
+        // ========== DATABASE MANAGEMENT FUNCTIONS ==========
+        async function createBackup() {
+            if (!confirm('Are you sure you want to create a backup? This will download a JSON file.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/backup`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Download as JSON file
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showToast('Backup created and downloaded successfully!', 'success');
+                } else {
+                    const error = await response.json();
+                    showToast(error.detail || 'Failed to create backup', 'error');
+                }
+            } catch (error) {
+                showToast('Failed to create backup', 'error');
+                console.error('Backup error:', error);
+            }
+        }
+
+        async function exportData() {
+            const dataType = document.getElementById('exportDataType').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/export/${dataType}`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Download as JSON file
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${dataType}_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showToast(`${dataType} exported successfully!`, 'success');
+                } else {
+                    const error = await response.json();
+                    showToast(error.detail || 'Failed to export data', 'error');
+                }
+            } catch (error) {
+                showToast('Failed to export data', 'error');
+                console.error('Export error:', error);
+            }
+        }
+
+        async function loadDatabaseStats() {
+            try {
+                const stats = await loadStatisticsFromDatabase();
+                const statsDiv = document.getElementById('databaseStats');
+                
+                if (stats && Object.keys(stats).length > 0) {
+                    statsDiv.innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                            <div>
+                                <div style="font-size: 12px; color: var(--gray);">Total Users</div>
+                                <div style="font-size: 24px; font-weight: bold; color: var(--primary);">${stats.total_users || 0}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--gray);">Total Tickets</div>
+                                <div style="font-size: 24px; font-weight: bold; color: var(--primary);">${stats.total_tickets || 0}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--gray);">Open Tickets</div>
+                                <div style="font-size: 24px; font-weight: bold; color: var(--warning);">${stats.open_tickets || 0}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--gray);">Chat Sessions</div>
+                                <div style="font-size: 24px; font-weight: bold; color: var(--secondary);">${stats.total_chats || 0}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--gray);">FAQ Items</div>
+                                <div style="font-size: 24px; font-weight: bold; color: #3b82f6;">${stats.total_faq_items || 0}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: var(--gray);">Knowledge Items</div>
+                                <div style="font-size: 24px; font-weight: bold; color: var(--success);">${stats.total_knowledge_items || 0}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    statsDiv.innerHTML = '<p style="color: var(--gray);">No statistics available.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading database stats:', error);
+                document.getElementById('databaseStats').innerHTML = 
+                    '<p style="color: var(--danger);">Failed to load statistics.</p>';
+            }
+        }
+
+        async function loadStatisticsFromDatabase() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`, {
+                    headers: { 
+                        'Accept': 'application/json',
+                        'Authorization': authToken ? `Bearer ${authToken}` : ''
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.statistics || {};
+                }
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+            return {};
+        }
+
+        async function searchDatabase() {
+            const query = document.getElementById('databaseSearch').value.trim();
+            
+            if (!query) {
+                showToast('Please enter a search query', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/search?query=${encodeURIComponent(query)}`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const resultsDiv = document.getElementById('searchResults');
+                resultsDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Searching...</p>';
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displaySearchResults(data);
+                } else {
+                    const error = await response.json();
+                    resultsDiv.innerHTML = `<p style="color: var(--danger);">Error: ${error.detail || 'Search failed'}</p>`;
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                document.getElementById('searchResults').innerHTML = 
+                    '<p style="color: var(--danger);">Search failed. Please try again.</p>';
+            }
+        }
+
+        function displaySearchResults(data) {
+            const resultsDiv = document.getElementById('searchResults');
+            let html = '';
+            
+            if (data.results) {
+                const totalResults = 
+                    (data.results.tickets?.length || 0) + 
+                    (data.results.faq?.length || 0) + 
+                    (data.results.knowledge?.length || 0);
+                
+                if (totalResults === 0) {
+                    html = '<p style="color: var(--gray); text-align: center; padding: 20px;">No results found.</p>';
+                } else {
+                    html = `<h5>Search Results for "${data.query}" (${totalResults} found)</h5>`;
+                    
+                    // Tickets
+                    if (data.results.tickets?.length > 0) {
+                        html += `
+                            <div style="margin-top: 20px;">
+                                <h6 style="color: var(--primary); margin-bottom: 10px;">
+                                    <i class="fas fa-ticket-alt"></i> Tickets (${data.results.tickets.length})
+                                </h6>
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                        `;
+                        
+                        data.results.tickets.forEach(result => {
+                            html += `
+                                <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary);">
+                                    <div style="font-weight: 600; color: var(--dark);">${result.data.subject || 'No Subject'}</div>
+                                    <div style="color: var(--gray); font-size: 14px; margin-top: 5px;">
+                                        ${result.data.description?.substring(0, 100)}...
+                                    </div>
+                                    <div style="display: flex; gap: 10px; margin-top: 10px; font-size: 12px;">
+                                        <span class="priority-badge priority-${result.data.priority || 'medium'}">
+                                            ${result.data.priority || 'medium'}
+                                        </span>
+                                        <span class="status-badge status-${result.data.status ? result.data.status.replace('-', '') : 'open'}">
+                                            ${result.data.status || 'open'}
+                                        </span>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        html += '</div></div>';
+                    }
+                    
+                    // FAQ
+                    if (data.results.faq?.length > 0) {
+                        html += `
+                            <div style="margin-top: 20px;">
+                                <h6 style="color: var(--secondary); margin-bottom: 10px;">
+                                    <i class="fas fa-question-circle"></i> FAQ (${data.results.faq.length})
+                                </h6>
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                        `;
+                        
+                        data.results.faq.forEach(result => {
+                            html += `
+                                <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; border-left: 4px solid var(--secondary);">
+                                    <div style="font-weight: 600; color: var(--dark);">${result.data.question || 'No Question'}</div>
+                                    <div style="color: var(--gray); font-size: 14px; margin-top: 5px;">
+                                        ${result.data.answer?.substring(0, 100)}...
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        html += '</div></div>';
+                    }
+                    
+                    // Knowledge Base
+                    if (data.results.knowledge?.length > 0) {
+                        html += `
+                            <div style="margin-top: 20px;">
+                                <h6 style="color: var(--warning); margin-bottom: 10px;">
+                                    <i class="fas fa-book"></i> Knowledge Base (${data.results.knowledge.length})
+                                </h6>
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                        `;
+                        
+                        data.results.knowledge.forEach(result => {
+                            html += `
+                                <div style="background: #fffbeb; padding: 15px; border-radius: 8px; border-left: 4px solid var(--warning);">
+                                    <div style="font-weight: 600; color: var(--dark);">${result.data.title || 'No Title'}</div>
+                                    <div style="color: var(--gray); font-size: 14px; margin-top: 5px;">
+                                        ${result.data.content?.substring(0, 100)}...
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        html += '</div></div>';
+                    }
+                }
+            } else {
+                html = '<p style="color: var(--gray); text-align: center; padding: 20px;">No results found.</p>';
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // ========== SEARCH FUNCTIONALITY ==========
+        function setupSearch() {
+            const searchInput = document.getElementById('globalSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const query = this.value.trim();
+                        if (query) {
+                            performSearch(query);
+                        }
+                    }
+                });
+            }
+        }
+
+        function performSearch(query) {
+            showToast(`Searching for: "${query}"`, 'info');
+            
+            // Show chat section and send the query as a message
+            showSection('chat');
+            document.getElementById('messageInput').value = query;
+            
+            // Wait a bit then send the message
+            setTimeout(() => {
+                sendMessage();
+            }, 1000);
+        }
+
+        // ========== INITIAL SETUP ==========
+        // Show dashboard by default
+        showSection('dashboard');
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            const modals = document.querySelectorAll('.modal.active');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
